@@ -1,8 +1,6 @@
-const Joi = require("@hapi/joi");
 const express = require("express");
-const app = express();
-
-app.use(express.json());
+const router = express.Router();
+const Joi = require("@hapi/joi");
 
 const genres = [
   { _id: 0, name: "Action" },
@@ -14,18 +12,18 @@ const genres = [
 ];
 
 // * ----------  GET  ----------
-app.get("/api/genres", (req, res) => {
+router.get("/", (req, res) => {
   res.send(genres);
 });
 
-app.get("/api/genres/:_id", (req, res) => {
+router.get("/:_id", (req, res) => {
   const genre = genres.find(e => e._id === parseInt(req.params._id));
   if (!genre) return res.status(404).send("Genre not found");
   res.send(genre);
 });
 
 // * ----------  POST  ----------
-app.post("/api/genres", (req, res) => {
+router.post("/", (req, res) => {
   const { error } = validateGenre(req.body);
   if (error) return res.status(400).send(error.details[0].message);
 
@@ -38,7 +36,7 @@ app.post("/api/genres", (req, res) => {
 });
 
 // * ----------  PUT  ----------
-app.put("/api/genres/:_id", (req, res) => {
+router.put("/:_id", (req, res) => {
   // Remember, in JS arrays and Objects are passed by reference. genre = reference to genres.
   const genre = genres.find(e => e._id === parseInt(req.params._id));
   if (!genre) return res.status(404).send("Genre not found");
@@ -51,7 +49,7 @@ app.put("/api/genres/:_id", (req, res) => {
 });
 
 // * ----------  DELETE  ----------
-app.delete("/api/genres/:_id", (req, res) => {
+router.delete("/:_id", (req, res) => {
   const genre = genres.find(e => e._id === parseInt(req.params._id));
   if (!genre) return res.status(404).send("Genre not found");
   genres.splice(genres.indexOf(genre), 1);
@@ -69,6 +67,4 @@ function validateGenre(genre) {
   return schema.validate(genre);
 }
 
-// * SET PORT AND START LISTENING
-const port = process.env.PORT || 3000;
-app.listen(port, () => console.log(`listening on port ${port}...`));
+module.exports = router;
