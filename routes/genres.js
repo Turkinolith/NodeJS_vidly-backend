@@ -3,6 +3,19 @@ const router = express.Router();
 const Joi = require("@hapi/joi");
 const mongoose = require("mongoose");
 
+// * ----------  PRE VALIDATE GENRE NAMES ----------
+function validateGenre(genre) {
+  const schema = Joi.object({
+    name: Joi.string()
+      .min(3)
+      .max(50)
+      .trim()
+      .required()
+  });
+
+  return schema.validate(genre);
+}
+
 //* Define genres model (moved the schema declaration into it.)
 const Genres = mongoose.model(
   "Genre",
@@ -52,7 +65,7 @@ router.get("/", async (req, res) => {
   }
 });
 
-// //! Returns a specific genre
+//! Returns a specific genre
 router.get("/:_id", async (req, res) => {
   try {
     const genre = await Genres.findById(req.params._id);
@@ -97,17 +110,7 @@ router.delete("/:_id", async (req, res) => {
   }
 });
 
-// * ----------  PRE VALIDATE GENRE NAMES ----------
-function validateGenre(genre) {
-  const schema = Joi.object({
-    name: Joi.string()
-      .min(3)
-      .max(50)
-      .trim()
-      .required()
-  });
-
-  return schema.validate(genre);
-}
-
+////////////////////////
+//! Exports
+////////////////////////
 module.exports = router;
