@@ -1,6 +1,7 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const genres = require("./routes/genres");
+const customers = require("./routes/customers");
 const app = express();
 
 mongoose.set("useNewUrlParser", true);
@@ -16,6 +17,7 @@ mongoose
 
 app.use(express.json());
 app.use("/api/genres", genres);
+app.use("/api/customers", customers);
 
 // * SET PORT AND START LISTENING
 const port = process.env.PORT || 3000;
