@@ -1,56 +1,13 @@
+const { Customers, validate } = require("../models/customer");
 const express = require("express");
 const router = express.Router();
-const Joi = require("@hapi/joi");
-const CustomJoi = Joi.extend(require("joi-phone-number"));
-const mongoose = require("mongoose");
-
-// * ----------  PRE VALIDATE CUSTOMER NAME and PHONE NUMBER ----------
-function validateCustomer(customer) {
-  const schema = CustomJoi.object({
-    name: CustomJoi.string()
-      .min(2)
-      .max(30)
-      .trim()
-      .required(),
-    phone: CustomJoi.string()
-      .phoneNumber({ defaultCountry: "US", strict: true })
-      .trim()
-      .required(),
-    isGold: CustomJoi.boolean()
-  });
-
-  return schema.validate(customer);
-}
-
-//* Define customers model (moved the schema declaration into it.)
-const Customers = mongoose.model(
-  "Customer",
-  new mongoose.Schema({
-    name: {
-      type: String,
-      required: true,
-      minlength: 2,
-      maxlength: 30,
-      trim: true
-    },
-    phone: {
-      type: String,
-      required: true,
-      trim: true
-    },
-    isGold: {
-      type: Boolean,
-      default: false
-    }
-  })
-);
 
 ////////////////////
 //! [C]-RUD
 ////////////////////
 //* With error handling to prevent duplicates.
 router.post("/", async (req, res) => {
-  const { error } = validateCustomer(req.body);
+  const { error } = validate(req.body);
   if (error) return res.status(400).send(error.details[0].message);
 
   try {
@@ -69,7 +26,6 @@ router.post("/", async (req, res) => {
 ////////////////////
 //! C-[R]-UD
 ////////////////////
-
 //! *** Returns all customers ***
 //* Also sorts customers by name
 router.get("/", async (req, res) => {
@@ -97,7 +53,7 @@ router.get("/:_id", async (req, res) => {
 ////////////////////
 //! Updates a specific customer and returns the updated value
 router.put("/:_id", async (req, res) => {
-  const { error } = validateCustomer(req.body);
+  const { error } = validate(req.body);
   if (error) return res.status(400).send(error.details[0].message);
 
   try {

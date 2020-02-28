@@ -1,42 +1,13 @@
+const { Genres, validate } = require("../Models/genre");
 const express = require("express");
 const router = express.Router();
-const Joi = require("@hapi/joi");
-const mongoose = require("mongoose");
-
-// * ----------  PRE VALIDATE GENRE NAMES ----------
-function validateGenre(genre) {
-  const schema = Joi.object({
-    name: Joi.string()
-      .min(3)
-      .max(50)
-      .trim()
-      .required()
-  });
-
-  return schema.validate(genre);
-}
-
-//* Define genres model (moved the schema declaration into it.)
-const Genres = mongoose.model(
-  "Genre",
-  new mongoose.Schema({
-    name: {
-      type: String,
-      required: true,
-      minlength: 3,
-      maxlength: 50,
-      trim: true,
-      unique: true
-    }
-  })
-);
 
 ////////////////////
 //! [C]-RUD
 ////////////////////
 //* With error handling to prevent duplicates.
 router.post("/", async (req, res) => {
-  const { error } = validateGenre(req.body);
+  const { error } = validate(req.body);
   if (error) return res.status(400).send(error.details[0].message);
 
   try {
@@ -81,7 +52,7 @@ router.get("/:_id", async (req, res) => {
 ////////////////////
 //! Updates a specific genre and returns the updated value
 router.put("/:_id", async (req, res) => {
-  const { error } = validateGenre(req.body);
+  const { error } = validate(req.body);
   if (error) return res.status(400).send(error.details[0].message);
 
   try {
