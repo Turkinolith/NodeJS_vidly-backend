@@ -14,20 +14,20 @@ function validateGenre(genre) {
   return schema.validate(genre);
 }
 
-//* Define genres model (moved the schema declaration into it.)
-const Genres = mongoose.model(
-  "Genre",
-  new mongoose.Schema({
-    name: {
-      type: String,
-      required: true,
-      minlength: 3,
-      maxlength: 50,
-      trim: true,
-      unique: true
-    }
-  })
-);
+const genreSchema = new mongoose.Schema({
+  name: {
+    type: String,
+    required: true,
+    minlength: 3,
+    maxlength: 50,
+    trim: true,
+    unique: true
+  }
+});
 
+//* Define genres model (moved the schema declaration into it.)
+const Genres = mongoose.model("Genre", genreSchema);
+
+exports.genreSchema = genreSchema;
 exports.Genres = Genres;
 exports.validate = validateGenre;
