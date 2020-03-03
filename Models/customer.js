@@ -2,29 +2,6 @@ const mongoose = require("mongoose");
 const Joi = require("@hapi/joi");
 const CustomJoi = Joi.extend(require("joi-phone-number"));
 
-//* Define customers model (moved the schema declaration into it.)
-const Customers = mongoose.model(
-  "Customer",
-  new mongoose.Schema({
-    name: {
-      type: String,
-      required: true,
-      minlength: 2,
-      maxlength: 30,
-      trim: true
-    },
-    phone: {
-      type: String,
-      required: true,
-      trim: true
-    },
-    isGold: {
-      type: Boolean,
-      default: false
-    }
-  })
-);
-
 // * ----------  PRE VALIDATE CUSTOMER NAME and PHONE NUMBER ----------
 function validateCustomer(customer) {
   const schema = CustomJoi.object({
@@ -42,6 +19,30 @@ function validateCustomer(customer) {
 
   return schema.validate(customer);
 }
+
+const customerSchema = new mongoose.Schema({
+  name: {
+    type: String,
+    required: true,
+    minlength: 2,
+    maxlength: 30,
+    trim: true
+  },
+  phone: {
+    type: String,
+    required: true,
+    trim: true,
+    minlength: 5,
+    maxlength: 50
+  },
+  isGold: {
+    type: Boolean,
+    default: false
+  }
+});
+
+//* Define customers model (moved the schema declaration into it.)
+const Customers = mongoose.model("Customer", customerSchema);
 
 exports.Customers = Customers;
 exports.validate = validateCustomer;

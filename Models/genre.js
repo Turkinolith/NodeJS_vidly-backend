@@ -20,8 +20,7 @@ const genreSchema = new mongoose.Schema({
     required: true,
     minlength: 3,
     maxlength: 50,
-    trim: true,
-    unique: true
+    trim: true
   }
 });
 

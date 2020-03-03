@@ -1,4 +1,4 @@
-const { Movie, validateMovie } = require("../Models/movie");
+const { Movies, validateMovie } = require("../Models/movie");
 const { Genres } = require("../Models/genre");
 const express = require("express");
 const router = express.Router();
@@ -16,11 +16,9 @@ router.post("/", async (req, res) => {
   if (!genre) return res.status(400).send("Invalid genre.");
 
   try {
-    const movie = new Movie({
+    const movie = new Movies({
       title: req.body.title,
       genre: {
-        //* Why not set the genre here to the genre object on line 15?
-        //* Because it has/could-have more properties that I don't want to put into the movie DB. I don't want to store all of those properties here.
         _id: genre._id,
         name: genre.name
       },
@@ -43,7 +41,7 @@ router.post("/", async (req, res) => {
 //* Also sorts movies by title
 router.get("/", async (req, res) => {
   try {
-    const movies = await Movie.find().sort("title");
+    const movies = await Movies.find().sort("title");
     res.send(movies);
   } catch (err) {
     res.status(500).send("Error getting movie list");
@@ -53,7 +51,7 @@ router.get("/", async (req, res) => {
 //! Returns a specific movie
 router.get("/:_id", async (req, res) => {
   try {
-    const movie = await Movie.findById(req.params._id);
+    const movie = await Movies.findById(req.params._id);
     if (!movie) return res.status(404).send("Movie not found"); //* If the response is null, return a 404, value has already been deleted.
     res.send(movie);
   } catch (err) {
@@ -73,7 +71,7 @@ router.put("/:_id", async (req, res) => {
   if (!genre) return res.status(400).send("Invalid genre.");
 
   try {
-    const movie = await Movie.findByIdAndUpdate(
+    const movie = await Movies.findByIdAndUpdate(
       req.params._id,
       {
         title: req.body.title,
@@ -95,7 +93,7 @@ router.put("/:_id", async (req, res) => {
 ////////////////////
 router.delete("/:_id", async (req, res) => {
   try {
-    const response = await Movie.findByIdAndDelete(req.params._id);
+    const response = await Movies.findByIdAndDelete(req.params._id);
     if (!response) return res.status(404).send("Movie not found"); //* If the response is null, return a 404, value has already been deleted.
     res.send(response);
   } catch (err) {

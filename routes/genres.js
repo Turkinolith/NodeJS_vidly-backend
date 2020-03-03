@@ -5,7 +5,8 @@ const router = express.Router();
 ////////////////////
 //! [C]-RUD
 ////////////////////
-//* With error handling to prevent duplicates.
+//* Expected input format: {"name": "string"}
+
 router.post("/", async (req, res) => {
   const { error } = validate(req.body);
   if (error) return res.status(400).send(error.details[0].message);
@@ -15,8 +16,6 @@ router.post("/", async (req, res) => {
     genre = await genre.save();
     res.send(genre);
   } catch (ex) {
-    if (ex.code)
-      return res.status(500).send(new Error("Error: Duplicate genre").message);
     res.status(500).send(ex.message);
   }
 });

@@ -26,43 +26,36 @@ function validateMovie(movie) {
   return schema.validate(movie);
 }
 
-//* Define movies model (moved the schema declaration into it.)
-const Movie = mongoose.model(
-  "Movies",
-  new mongoose.Schema({
-    title: {
-      type: String,
-      required: true,
-      minlength: 2,
-      maxlength: 90,
-      trim: true,
-      unique: true
-    },
-    numberInStock: {
-      type: Number,
-      min: 0,
-      max: 255,
-      required: true
-    },
-    dailyRentalRate: {
-      type: Number,
-      min: 0,
-      max: 255,
-      required: true,
-      validate: {
-        validator: function(v) {
-          return v <= this.numberInStock;
-        },
-        message:
-          "Daily rental rate must be less than or equall to number in stock."
-      }
-    },
-    genre: {
-      type: genreSchema,
-      required: true
-    }
-  })
-);
+const movieSchema = new mongoose.Schema({
+  title: {
+    type: String,
+    required: true,
+    minlength: 2,
+    maxlength: 90,
+    trim: true,
+    unique: true
+  },
+  numberInStock: {
+    type: Number,
+    min: 0,
+    max: 255,
+    required: true
+  },
+  dailyRentalRate: {
+    type: Number,
+    min: 0,
+    max: 255,
+    required: true
+  },
+  genre: {
+    type: genreSchema,
+    required: true
+  }
+});
 
-exports.Movie = Movie;
+//* Define movies model (moved the schema declaration into it.)
+const Movies = mongoose.model("Movie", movieSchema);
+
+exports.Movie = Movies;
 exports.validateMovie = validateMovie;
+exports.movieSchema = movieSchema;
