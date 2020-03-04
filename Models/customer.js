@@ -42,7 +42,14 @@ const customerSchema = new mongoose.Schema({
 });
 
 //* Define customers model (moved the schema declaration into it.)
-const Customers = mongoose.model("Customer", customerSchema);
+let Customers;
+try {
+  Customers = mongoose.model("Customer");
+} catch (error) {
+  Customers = mongoose.model("Customer", customerSchema);
+}
+
+//const Customers = mongoose.model("Customer", customerSchema);
 
 exports.Customers = Customers;
 exports.validate = validateCustomer;

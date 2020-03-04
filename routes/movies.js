@@ -41,8 +41,8 @@ router.post("/", async (req, res) => {
 //* Also sorts movies by title
 router.get("/", async (req, res) => {
   try {
-    const movies = await Movies.find().sort("title");
-    res.send(movies);
+    const movieList = await Movies.find().sort("title");
+    res.send(movieList);
   } catch (err) {
     res.status(500).send("Error getting movie list");
   }

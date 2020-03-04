@@ -56,6 +56,6 @@ const movieSchema = new mongoose.Schema({
 //* Define movies model (moved the schema declaration into it.)
 const Movies = mongoose.model("Movie", movieSchema);
 
-exports.Movie = Movies;
+exports.Movies = Movies;
 exports.validateMovie = validateMovie;
 exports.movieSchema = movieSchema;
