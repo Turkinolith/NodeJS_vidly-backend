@@ -2,6 +2,7 @@ const { Rentals, validateRental } = require("../Models/rental");
 const { Movies } = require("../Models/movie");
 const { Customers } = require("../Models/customer");
 const express = require("express");
+const mongoose = require("mongoose");
 const router = express.Router();
 
 ////////////////////
@@ -10,42 +11,56 @@ const router = express.Router();
 //* Expected Format { "customerId": "string" "movieId": "string" }
 
 router.post("/", async (req, res) => {
+  // Having the error set up this way allows the error message to pass on correctly, in the prior way I set it up in a try/catch block it wasn't being passed on.
   const { error } = validateRental(req.body);
   if (error) return res.status(400).send(error.details[0].message);
 
-  const customer = await Customers.findById(req.body.customerId);
-  if (!customer) return res.status(400).send("Invalid customer.");
+  let customer = null;
+  try {
+    customer = await Customers.findById(req.body.customerId);
+  } catch (err) {
+    return res.status(400).send("Invalid customer.");
+  }
 
-  const movie = await Movies.findById(req.body.movieId);
-  if (!movie) return res.status(400).send("Invalid movie.");
+  let movie = null;
+  try {
+    movie = await Movies.findById(req.body.movieId);
+  } catch (err) {
+    return res.status(400).send("Invalid movie.");
+  }
 
   if (movie.numberInStock === 0)
     return res.status(400).send("Movie not in stock.");
 
-  let rental = new Rentals({
-    renter: {
-      _id: customer._id,
-      name: customer.name,
-      phone: customer.phone,
-      isGold: customer.isGold
-    },
-    movie: {
-      _id: movie._id,
-      title: movie.title,
-      dailyRentalRate: movie.dailyRentalRate
-    }
-  });
+  try {
+    mongoose.startSession().then(session => {
+      session.withTransaction(
+        async () => {
+          let rental = new Rentals({
+            renter: {
+              _id: customer._id,
+              name: customer.name,
+              phone: customer.phone,
+              isGold: customer.isGold
+            },
+            movie: {
+              _id: movie._id,
+              title: movie.title,
+              dailyRentalRate: movie.dailyRentalRate
+            }
+          });
 
-  ////////////////////////////
-  //! Here there is a problem, we have 2 seperate operations going on. If the server crashes after the rental save, the decrement of stock may not occur.
-  //! This needs a "transaction" where both actions need to happen, or neither are applied.
-  //! There is a technique called "2 phase commit", but that is an advanced topic beyond the scope of this course.
-  rental = await rental.save();
-
-  movie.numberInStock--;
-  movie.save();
-  ////////////////////////////
-  res.send(rental);
+          await rental.save();
+          movie.numberInStock--;
+          await movie.save();
+          res.send(rental);
+        },
+        { writeConcern: { wtimeout: 5000 } }
+      );
+    });
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
 });
 
 ////////////////////

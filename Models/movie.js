@@ -19,7 +19,7 @@ function validateMovie(movie) {
       .min(0)
       .max(Joi.ref("numberInStock"))
       .required(),
-    genreId: Joi.string() //! Note genreId, not genre, because you want the client to ONLY send the genreId
+    genreId: Joi.objectId() //! Note genreId, not genre, because you want the client to ONLY send the genreId
       .required()
   });
 
