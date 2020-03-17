@@ -1,3 +1,4 @@
+const config = require("config");
 const express = require("express");
 const mongoose = require("mongoose");
 const Joi = require("@hapi/joi");
@@ -7,12 +8,18 @@ const movies = require("./routes/movies");
 const rentals = require("./routes/rentals");
 const users = require("./routes/users");
 const customers = require("./routes/customers");
+const auth = require("./routes/auth");
 const app = express();
 
 mongoose.set("useNewUrlParser", true);
 mongoose.set("useFindAndModify", false);
 mongoose.set("useCreateIndex", true);
 mongoose.set("useUnifiedTopology", true);
+
+if (!config.get("jwtPrivateKey")) {
+  console.error("FATAL ERROR: jwtPrivateKey is not defined.");
+  process.exit(1);
+}
 
 //* This connection string is hardcoded, but in a real app it should be located in a cfg file.
 mongoose
@@ -39,6 +46,7 @@ app.use("/api/movies", movies);
 app.use("/api/rentals", rentals);
 app.use("/api/users", users);
 app.use("/api/customers", customers);
+app.use("/api/auth", auth);
 
 // * SET PORT AND START LISTENING
 const port = process.env.PORT || 3000;

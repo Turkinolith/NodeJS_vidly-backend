@@ -1,6 +1,7 @@
 const { Users, validateUser } = require("../models/user");
 const express = require("express");
 const router = express.Router();
+const bcrypt = require("bcrypt");
 const _ = require("lodash");
 
 ////////////////////
@@ -19,6 +20,9 @@ router.post("/", async (req, res) => {
   try {
     // Using lodash to ensure that only the name email and password fields are processed.
     user = new Users(_.pick(req.body, ["name", "email", "password"]));
+    const salt = await bcrypt.genSalt(11);
+    user.password = await bcrypt.hash(user.password, salt);
+
     await user.save();
 
     // Using lodash again to return the saved user object, minus the password.
