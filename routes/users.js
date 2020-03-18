@@ -25,8 +25,11 @@ router.post("/", async (req, res) => {
 
     await user.save();
 
+    const token = user.generateAuthToken();
     // Using lodash again to return the saved user object, minus the password.
-    res.send(_.pick(user, ["_id", "name", "email"]));
+    res
+      .header("x-auth-token", token)
+      .send(_.pick(user, ["_id", "name", "email"]));
   } catch (ex) {
     res.status(500).send(ex.message);
   }

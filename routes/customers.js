@@ -1,3 +1,4 @@
+const auth = require("../middleware/auth");
 const { Customers, validate } = require("../models/customer");
 const express = require("express");
 const router = express.Router();
@@ -7,7 +8,7 @@ const router = express.Router();
 ////////////////////
 //* Expected input format: {"name": "string", "phone": "stringOfNumbers", "isGold": "bool"}
 
-router.post("/", async (req, res) => {
+router.post("/", auth, async (req, res) => {
   const { error } = validate(req.body);
   if (error) return res.status(400).send(error.details[0].message);
 
@@ -53,7 +54,7 @@ router.get("/:_id", async (req, res) => {
 //! CR-[U]-D
 ////////////////////
 //! Updates a specific customer and returns the updated value
-router.put("/:_id", async (req, res) => {
+router.put("/:_id", auth, async (req, res) => {
   const { error } = validate(req.body);
   if (error) return res.status(400).send(error.details[0].message);
 
@@ -73,7 +74,7 @@ router.put("/:_id", async (req, res) => {
 ////////////////////
 //! CRU-[D]
 ////////////////////
-router.delete("/:_id", async (req, res) => {
+router.delete("/:_id", auth, async (req, res) => {
   try {
     const response = await Customers.findByIdAndDelete(req.params._id);
     if (!response) return res.status(404).send("Customer not found"); //* If the response is null, return a 404, value has already been deleted.

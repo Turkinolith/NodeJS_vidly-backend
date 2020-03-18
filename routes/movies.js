@@ -1,3 +1,4 @@
+const auth = require("../middleware/auth");
 const { Movies, validateMovie } = require("../Models/movie");
 const { Genres } = require("../Models/genre");
 const express = require("express");
@@ -8,7 +9,7 @@ const router = express.Router();
 ////////////////////
 //* Expected input format: {"title": "string", "genreId": "string", "numberInStock": "number", "dailyRentalRate": "number"}
 
-router.post("/", async (req, res) => {
+router.post("/", auth, async (req, res) => {
   const { error } = validateMovie(req.body);
   if (error) return res.status(400).send(error.details[0].message);
 
@@ -63,7 +64,7 @@ router.get("/:_id", async (req, res) => {
 //! CR-[U]-D
 ////////////////////
 //! Updates a specific genre and returns the updated value
-router.put("/:_id", async (req, res) => {
+router.put("/:_id", auth, async (req, res) => {
   const { error } = validateMovie(req.body);
   if (error) return res.status(400).send(error.details[0].message);
 
@@ -91,7 +92,7 @@ router.put("/:_id", async (req, res) => {
 ////////////////////
 //! CRU-[D]
 ////////////////////
-router.delete("/:_id", async (req, res) => {
+router.delete("/:_id", auth, async (req, res) => {
   try {
     const response = await Movies.findByIdAndDelete(req.params._id);
     if (!response) return res.status(404).send("Movie not found"); //* If the response is null, return a 404, value has already been deleted.

@@ -1,3 +1,4 @@
+const auth = require("../middleware/auth");
 const { Rentals, validateRental } = require("../Models/rental");
 const { Movies } = require("../Models/movie");
 const { Customers } = require("../Models/customer");
@@ -10,7 +11,7 @@ const router = express.Router();
 ////////////////////
 //* Expected Format { "customerId": "string" "movieId": "string" }
 
-router.post("/", async (req, res) => {
+router.post("/", auth, async (req, res) => {
   // Having the error set up this way allows the error message to pass on correctly, in the prior way I set it up in a try/catch block it wasn't being passed on.
   const { error } = validateRental(req.body);
   if (error) return res.status(400).send(error.details[0].message);

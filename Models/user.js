@@ -1,6 +1,8 @@
 const mongoose = require("mongoose");
 const Joi = require("@hapi/joi");
 const passwordComplexity = require("joi-password-complexity");
+const config = require("config");
+const jwt = require("jsonwebtoken");
 
 // * ----------  PRE VALIDATE CUSTOMER NAME and PHONE NUMBER ----------
 function validateUser(user) {
@@ -59,6 +61,12 @@ const userSchema = new mongoose.Schema({
     maxlength: 1024
   }
 });
+
+//* Attach the creation logic for a Token as a method on the user object
+userSchema.methods.generateAuthToken = function() {
+  const token = jwt.sign({ _id: this._id }, config.get("jwtPrivateKey"));
+  return token;
+};
 
 //* Define customers model (moved the schema declaration into it.)
 let Users;
