@@ -1,3 +1,4 @@
+const auth = require("../middleware/auth");
 const { Users, validateUser } = require("../models/user");
 const express = require("express");
 const router = express.Router();
@@ -33,6 +34,15 @@ router.post("/", async (req, res) => {
   } catch (ex) {
     res.status(500).send(ex.message);
   }
+});
+
+////////////////////
+//! C-[R]-UD
+////////////////////
+
+router.get("/me", auth, async (req, res) => {
+  const user = await Users.findById(req.user._id).select("-password");
+  res.send(user);
 });
 
 ////////////////////////
