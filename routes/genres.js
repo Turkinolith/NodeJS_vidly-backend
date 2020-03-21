@@ -1,4 +1,5 @@
 const auth = require("../middleware/auth");
+const admin = require("../middleware/admin");
 const { Genres, validate } = require("../Models/genre");
 const express = require("express");
 const router = express.Router();
@@ -71,7 +72,7 @@ router.put("/:_id", auth, async (req, res) => {
 ////////////////////
 //! CRU-[D]
 ////////////////////
-router.delete("/:_id", auth, async (req, res) => {
+router.delete("/:_id", [auth, admin], async (req, res) => {
   try {
     const response = await Genres.findByIdAndDelete(req.params._id);
     if (!response) return res.status(404).send("Genre not found"); //* If the response is null, return a 404, value has already been deleted.
