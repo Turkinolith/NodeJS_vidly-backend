@@ -9,7 +9,7 @@ const router = express.Router();
 ////////////////////
 //* Expected input format: {"name": "string"}
 
-router.post("/", auth, async (req, res) => {
+router.post("/", auth, async (req, res, next) => {
   const { error } = validate(req.body);
   if (error) return res.status(400).send(error.details[0].message);
 
@@ -18,7 +18,7 @@ router.post("/", auth, async (req, res) => {
     genre = await genre.save();
     res.send(genre);
   } catch (ex) {
-    res.status(500).send(ex.message);
+    next(ex);
   }
 });
 
@@ -29,12 +29,8 @@ router.post("/", auth, async (req, res) => {
 //! *** Returns all genres ***
 //* Also sorts genres by name
 router.get("/", async (req, res) => {
-  try {
-    const genres = await Genres.find().sort("name");
-    res.send(genres);
-  } catch (err) {
-    res.status(500).send("Error getting genre list");
-  }
+  const genres = await Genres.find().sort("name");
+  res.send(genres);
 });
 
 //! Returns a specific genre

@@ -1,3 +1,6 @@
+require("express-async-errors");
+
+const error = require("./middleware/error");
 const config = require("config");
 const express = require("express");
 const mongoose = require("mongoose");
@@ -16,24 +19,25 @@ mongoose.set("useFindAndModify", false);
 mongoose.set("useCreateIndex", true);
 mongoose.set("useUnifiedTopology", true);
 
+//* Verify that secret keys are enabled
 if (!config.get("jwtPrivateKey")) {
   console.error("FATAL ERROR: jwtPrivateKey is not defined.");
   process.exit(1);
 }
+if (!config.get("mongoDBKey")) {
+  console.log("FATAL ERROR: mongoDBKey is not defined.");
+  process.exit(1);
+}
 
-//* This connection string is hardcoded, but in a real app it should be located in a cfg file.
+//* Establish Mongoose connection:
+
 mongoose
   //* Local DB
   //.connect("mongodb://localhost/vidly")
-  //* Atlas Cluster DB on AWS
-  //! REMOVE LOGIN LINE BEFORE PUSHING TO GIT OR OTHER SERVICE.
-  .connect(
-    "mongodb+srv://vidlyuser:5UfO6cjKJRmfv675@tester-00-dbmjh.mongodb.net/vidly?retyWrites=true&w=majority"
-  );
-//.then(() => console.log("connected to MongoDB..."))
-//.catch(err => console.log("Could not connect to MongoDB...", err.message));
+  //* Atlas Cluster DB on AWS using CFG key
+  .connect(config.get("mongoDBKey"));
 
-//* This replaces the .then and .catch from the connect above using event listeners.
+//* Notify on events if the DB is connected or announce error if could not connect.
 mongoose.connection
   .once("open", () => console.log("connected to Mongo database"))
   .on("error", error => {
@@ -47,6 +51,10 @@ app.use("/api/rentals", rentals);
 app.use("/api/users", users);
 app.use("/api/customers", customers);
 app.use("/api/auth", auth);
+
+//* Error Handling, always comes after other routes.
+//* Used for error 500's
+app.use(error);
 
 // * SET PORT AND START LISTENING
 const port = process.env.PORT || 3000;
