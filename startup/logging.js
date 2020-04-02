@@ -1,6 +1,6 @@
 const config = require("config");
 const winston = require("winston");
-require("winston-mongodb");
+//require("winston-mongodb");
 require("express-async-errors");
 // Requiring `winston-mongodb` will expose winston.transports.MongoDB`
 
@@ -32,7 +32,8 @@ const remoteLogConfig = {
           return `${info.timestamp} - [${info.level}]: ${info.message}`;
         })
       )
-    }),
+    })
+    /*     
     new winston.transports.MongoDB({
       db: config.get("mongoDBKey"),
       options: {
@@ -42,6 +43,7 @@ const remoteLogConfig = {
       capped: true,
       cappedSize: 1000000
     })
+ */
   ]
 };
 
