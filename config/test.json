@@ -1,4 +1,4 @@
 {
   "jwtPrivateKey": "1234",
-  "mongoDBKey": "1234"
+  "mongoDBKey": "mongodb+srv://vidlyuser:5UfO6cjKJRmfv675@tester-00-dbmjh.mongodb.net/vidly_test?retyWrites=true^&w=majority"
 }

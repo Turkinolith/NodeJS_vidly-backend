@@ -2,7 +2,6 @@ require("./startup/config")();
 const { logger } = require("./startup/logging");
 const express = require("express");
 const app = express();
-require("./startup/logging")();
 require("./startup/validation")();
 require("./startup/routes")(app);
 require("./startup/db")();

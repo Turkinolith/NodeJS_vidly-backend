@@ -1,5 +1,6 @@
 /node_modules
 /.vscode
 .env.development
+.env.test
 .run
 /config/test.json
