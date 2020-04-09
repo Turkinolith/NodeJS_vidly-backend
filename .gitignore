@@ -4,3 +4,4 @@
 .env.test
 .run
 /config/test.json
+/coverage
