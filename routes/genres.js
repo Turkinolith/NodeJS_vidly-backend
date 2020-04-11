@@ -49,7 +49,7 @@ router.get("/:_id", validateObjectId, async (req, res) => {
 //! CR-[U]-D
 ////////////////////
 //! Updates a specific genre and returns the updated value
-router.put("/:_id", auth, async (req, res) => {
+router.put("/:_id", [auth, validateObjectId], async (req, res) => {
   const { error } = validate(req.body);
   if (error) return res.status(400).send(error.details[0].message);
 
@@ -69,13 +69,14 @@ router.put("/:_id", auth, async (req, res) => {
 ////////////////////
 //! CRU-[D]
 ////////////////////
-router.delete("/:_id", [auth, admin], async (req, res) => {
+router.delete("/:_id", [auth, admin, validateObjectId], async (req, res) => {
   try {
     const response = await Genres.findByIdAndDelete(req.params._id);
-    if (!response) return res.status(404).send("Genre not found"); //* If the response is null, return a 404, value has already been deleted.
+    if (!response)
+      return res.status(404).send("Genre with given ID was not found"); //* If the response is null, return a 404, value has already been deleted.
     res.send(response);
   } catch (err) {
-    res.status(404).send("Genre not found");
+    res.status(400).send("Server Error");
   }
 });
 

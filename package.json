@@ -8,7 +8,7 @@
     "testEnvironment": "node"
   },
   "scripts": {
-    "test": "jest --watchAll --verbose --detectOpenHandles --coverage"
+    "test": "jest --verbose --detectOpenHandles --coverage"
   },
   "keywords": [],
   "author": "",
@@ -24,6 +24,7 @@
     "joi-phone-number": "^4.0.0",
     "jsonwebtoken": "^8.5.1",
     "lodash": "^4.17.15",
+    "moment": "^2.24.0",
     "mongoose": "^5.9.2",
     "winston": "^3.2.1",
     "winston-mongodb": "^5.0.1"
