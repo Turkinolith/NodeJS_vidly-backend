@@ -1,5 +1,5 @@
 const auth = require("../middleware/auth");
-const { Users, validateUser } = require("../models/user");
+const { Users, validateUser } = require("../Models/user");
 const express = require("express");
 const router = express.Router();
 const bcrypt = require("bcrypt");
