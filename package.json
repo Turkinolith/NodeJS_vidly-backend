@@ -8,7 +8,11 @@
     "testEnvironment": "node"
   },
   "scripts": {
-    "test": "jest --verbose --detectOpenHandles --coverage"
+    "test": "jest --verbose --detectOpenHandles --coverage",
+    "start": "node index.js"
+  },
+  "engines": {
+    "node": "12.14.1"
   },
   "keywords": [],
   "author": "",
