@@ -3,5 +3,5 @@
 .env.development
 .env.test
 .run
-/config.test
+/config/test.json
 /coverage
