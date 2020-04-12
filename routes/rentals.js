@@ -5,17 +5,14 @@ const { Customers } = require("../Models/customer");
 const express = require("express");
 const mongoose = require("mongoose");
 const router = express.Router();
+const validate = require("../middleware/validate");
 
 ////////////////////
 //! [C]-RUD
 ////////////////////
 //* Expected Format { "customerId": "string" "movieId": "string" }
 
-router.post("/", auth, async (req, res) => {
-  // Having the error set up this way allows the error message to pass on correctly, in the prior way I set it up in a try/catch block it wasn't being passed on.
-  const { error } = validateRental(req.body);
-  if (error) return res.status(400).send(error.details[0].message);
-
+router.post("/", [auth, validate(validateRental)], async (req, res) => {
   let customer = null;
   try {
     customer = await Customers.findById(req.body.customerId);
@@ -34,7 +31,7 @@ router.post("/", auth, async (req, res) => {
     return res.status(400).send("Movie not in stock.");
 
   try {
-    mongoose.startSession().then(session => {
+    mongoose.startSession().then((session) => {
       session.withTransaction(
         async () => {
           let rental = new Rentals({
@@ -42,13 +39,13 @@ router.post("/", auth, async (req, res) => {
               _id: customer._id,
               name: customer.name,
               phone: customer.phone,
-              isGold: customer.isGold
+              isGold: customer.isGold,
             },
             movie: {
               _id: movie._id,
               title: movie.title,
-              dailyRentalRate: movie.dailyRentalRate
-            }
+              dailyRentalRate: movie.dailyRentalRate,
+            },
           });
 
           await rental.save();

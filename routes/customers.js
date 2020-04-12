@@ -1,22 +1,20 @@
 const auth = require("../middleware/auth");
-const { Customers, validate } = require("../models/customer");
+const { Customers, validateCustomer } = require("../models/customer");
 const express = require("express");
 const router = express.Router();
+const validate = require("../middleware/validate");
 
 ////////////////////
 //! [C]-RUD
 ////////////////////
 //* Expected input format: {"name": "string", "phone": "stringOfNumbers", "isGold": "bool"}
 
-router.post("/", auth, async (req, res) => {
-  const { error } = validate(req.body);
-  if (error) return res.status(400).send(error.details[0].message);
-
+router.post("/", [auth, validate(validateCustomer)], async (req, res) => {
   try {
     const customer = new Customers({
       name: req.body.name,
       phone: req.body.phone,
-      isGold: req.body.isGold
+      isGold: req.body.isGold,
     });
     await customer.save();
     res.send(customer);
@@ -54,10 +52,7 @@ router.get("/:_id", async (req, res) => {
 //! CR-[U]-D
 ////////////////////
 //! Updates a specific customer and returns the updated value
-router.put("/:_id", auth, async (req, res) => {
-  const { error } = validate(req.body);
-  if (error) return res.status(400).send(error.details[0].message);
-
+router.put("/:_id", [auth, validate(validateCustomer)], async (req, res) => {
   try {
     const customer = await Customers.findByIdAndUpdate(
       req.params._id,

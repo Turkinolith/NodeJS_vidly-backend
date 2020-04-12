@@ -3,16 +3,14 @@ const { Movies, validateMovie } = require("../Models/movie");
 const { Genres } = require("../Models/genre");
 const express = require("express");
 const router = express.Router();
+const validate = require("../middleware/validate");
 
 ////////////////////
 //! [C]-RUD
 ////////////////////
 //* Expected input format: {"title": "string", "genreId": "string", "numberInStock": "number", "dailyRentalRate": "number"}
 
-router.post("/", auth, async (req, res) => {
-  const { error } = validateMovie(req.body);
-  if (error) return res.status(400).send(error.details[0].message);
-
+router.post("/", [auth, validate(validateMovie)], async (req, res) => {
   const genre = await Genres.findById(req.body.genreId); //* Searches Genres DB with ID# provided by genreId, returns genre object w. name & _id
   if (!genre) return res.status(400).send("Invalid genre.");
 
@@ -21,10 +19,10 @@ router.post("/", auth, async (req, res) => {
       title: req.body.title,
       genre: {
         _id: genre._id,
-        name: genre.name
+        name: genre.name,
       },
       numberInStock: req.body.numberInStock,
-      dailyRentalRate: req.body.dailyRentalRate
+      dailyRentalRate: req.body.dailyRentalRate,
     });
     await movie.save();
 
@@ -64,10 +62,7 @@ router.get("/:_id", async (req, res) => {
 //! CR-[U]-D
 ////////////////////
 //! Updates a specific genre and returns the updated value
-router.put("/:_id", auth, async (req, res) => {
-  const { error } = validateMovie(req.body);
-  if (error) return res.status(400).send(error.details[0].message);
-
+router.put("/:_id", [auth, validate(validateMovie)], async (req, res) => {
   const genre = await Genres.findById(req.body.genreId);
   if (!genre) return res.status(400).send("Invalid genre.");
 
@@ -78,7 +73,7 @@ router.put("/:_id", auth, async (req, res) => {
         title: req.body.title,
         numberInStock: req.body.numberInStock,
         dailyRentalRate: req.body.dailyRentalRate,
-        genre: { _id: genre._id, name: genre.name }
+        genre: { _id: genre._id, name: genre.name },
       },
       { new: true }
     );

@@ -1,19 +1,17 @@
 const auth = require("../middleware/auth");
 const admin = require("../middleware/admin");
 const validateObjectId = require("../middleware/validateObjectId");
-const { Genres, validate } = require("../Models/genre");
+const { Genres, validateGenre } = require("../Models/genre");
 const express = require("express");
 const router = express.Router();
+const validate = require("../middleware/validate");
 
 ////////////////////
 //! [C]-RUD
 ////////////////////
 //* Expected input format: {"name": "string"}
 
-router.post("/", auth, async (req, res, next) => {
-  const { error } = validate(req.body);
-  if (error) return res.status(400).send(error.details[0].message);
-
+router.post("/", [auth, validate(validateGenre)], async (req, res, next) => {
   try {
     let genre = new Genres({ name: req.body.name });
     genre = await genre.save();
@@ -49,22 +47,23 @@ router.get("/:_id", validateObjectId, async (req, res) => {
 //! CR-[U]-D
 ////////////////////
 //! Updates a specific genre and returns the updated value
-router.put("/:_id", [auth, validateObjectId], async (req, res) => {
-  const { error } = validate(req.body);
-  if (error) return res.status(400).send(error.details[0].message);
-
-  try {
-    const genre = await Genres.findByIdAndUpdate(
-      req.params._id,
-      { name: req.body.name },
-      { new: true }
-    );
-    if (!genre) return res.status(404).send("Genre not found"); //* If the response is null, return a 404, value has already been deleted.
-    res.send(genre);
-  } catch (err) {
-    res.status(404).send("Genre not found");
+router.put(
+  "/:_id",
+  [auth, validateObjectId, validate(validateGenre)],
+  async (req, res) => {
+    try {
+      const genre = await Genres.findByIdAndUpdate(
+        req.params._id,
+        { name: req.body.name },
+        { new: true }
+      );
+      if (!genre) return res.status(404).send("Genre not found"); //* If the response is null, return a 404, value has already been deleted.
+      res.send(genre);
+    } catch (err) {
+      res.status(404).send("Genre not found");
+    }
   }
-});
+);
 
 ////////////////////
 //! CRU-[D]
