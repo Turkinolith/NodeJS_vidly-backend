@@ -5,6 +5,7 @@ const app = express();
 require("./startup/validation")();
 require("./startup/routes")(app);
 require("./startup/db")();
+require("./startup/prod")(app);
 
 // * SET PORT AND START LISTENING
 const port = process.env.PORT || 3000;
