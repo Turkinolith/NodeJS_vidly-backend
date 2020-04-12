@@ -3,7 +3,6 @@ const router = express.Router();
 const { Movies } = require("../Models/movie");
 const { Rentals } = require("../Models/rental");
 const auth = require("../middleware/auth");
-const moment = require("moment");
 const mongoose = require("mongoose");
 const Joi = require("@hapi/joi");
 const validate = require("../middleware/validate");
@@ -21,14 +20,14 @@ router.post("/", [auth, validate(validateReturn)], async (req, res) => {
   if (rental.dateReturned)
     return res.status(400).send("Return already processed.");
 
-  rental.dateReturned = new Date();
-  const rentalDays = moment().diff(rental.dateOut, "days");
-  rental.rentalFee = rentalDays * rental.movie.dailyRentalRate;
-
+  //* All DB related edits are done in a single transaction so that in case of an error, the whole
+  //* edit can be undone and the DB isn't left in a broken state.
   try {
     mongoose.startSession().then((session) => {
       session.withTransaction(
         async () => {
+          rental.return();
+
           await rental.save();
 
           await Movies.updateOne(
@@ -37,7 +36,8 @@ router.post("/", [auth, validate(validateReturn)], async (req, res) => {
               $inc: { numberInStock: 1 },
             }
           );
-          res.status(200).send(rental);
+          //* Don't have to explicitly set status to 200, as express will set that by default
+          res.send(rental);
         },
         { writeConcern: { wtimeout: 5000 } }
       );

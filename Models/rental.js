@@ -1,5 +1,6 @@
 const Joi = require("@hapi/joi");
 const mongoose = require("mongoose");
+const moment = require("moment");
 
 function validateRental(rental) {
   const schema = Joi.object({
@@ -72,6 +73,14 @@ rentalSchema.statics.lookup = function (renterId, movieId) {
     "renter._id": renterId,
     "movie._id": movieId,
   });
+};
+
+//* Adding an instance method to the class to set the return date & calculate the rental fee.
+rentalSchema.methods.return = function () {
+  this.dateReturned = new Date();
+
+  const rentalDays = moment().diff(this.dateOut, "days");
+  this.rentalFee = rentalDays * this.movie.dailyRentalRate;
 };
 
 //* Define Rentals model
